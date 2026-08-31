@@ -8,7 +8,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name= "users")
+@Table(name= "webhook_users")
 @Getter
 @Setter
 @NoArgsConstructor
