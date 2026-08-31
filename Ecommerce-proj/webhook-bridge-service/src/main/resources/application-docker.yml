@@ -1,6 +1,6 @@
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_BROKER:ecom-kafka:9092}
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     listener:
       auto-startup: false
 

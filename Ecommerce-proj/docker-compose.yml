@@ -195,6 +195,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ecom-kafka:9092
     ports:
       - "9093:9093"
     networks:
@@ -217,6 +218,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ecom-kafka:9092
     ports:
       - "9094:9094"
     networks:
@@ -232,6 +234,7 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      KAFKA_BOOTSTRAP_SERVERS: ecom-kafka:9092
     ports:
       - "9095:9095"
     networks:
@@ -249,6 +252,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       WEBHOOK_PLATFORM_JWT_TOKEN: ${WEBHOOK_PLATFORM_JWT_TOKEN}
       APP_WEBHOOK_PLATFORM_JWT_TOKEN: ${WEBHOOK_PLATFORM_JWT_TOKEN}
+      KAFKA_BROKER: ecom-kafka:9092
     ports:
       - "9096:9096"
     networks:

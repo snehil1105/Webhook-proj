@@ -6,7 +6,7 @@ spring:
       host: ${REDIS_HOST:ecom-redis}
       port: ${REDIS_PORT:6379}
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:ecom-kafka:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     listener:
       auto-startup: false
 
