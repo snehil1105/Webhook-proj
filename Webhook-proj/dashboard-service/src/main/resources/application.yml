@@ -1,0 +1,46 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: dashboard-service
+
+  datasource:
+    # Read-only access to delivery-service's database
+    url: ${DB_URL:jdbc:postgresql://localhost:5434/delivery_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: dashboard-service-pool
+      maximum-pool-size: 5
+      read-only: true              # enforce read-only at the connection pool level too
+
+  jpa:
+    hibernate:
+      ddl-auto: none              # CRITICAL — we never modify delivery-service's schema
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: Asia/Kolkata  # avoids "invalid value for parameter TimeZone" on Windows hosts
+        format_sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 5000ms
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30}
+    expirationMs: 86400000
+  redis:
+    stream-name: webhook.events
+    dlq-stream-name: webhook.events.dlq
+
+logging:
+  level:
+    org.hibernate.SQL: debug

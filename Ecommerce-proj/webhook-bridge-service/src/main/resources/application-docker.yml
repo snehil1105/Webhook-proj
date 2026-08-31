@@ -1,0 +1,7 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:ecom-kafka:9092}
+
+app:
+  webhook-platform:
+    base-url: ${WEBHOOK_PLATFORM_URL:http://webhook-proj-api-gateway-1:8080}

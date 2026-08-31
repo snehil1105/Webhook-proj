@@ -1,0 +1,198 @@
+@base = http://localhost:9090
+
+@retailerJwt   = eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUkVUQUlMRVIiLCJlbWFpbCI6InJldGFpbGVyQHNob3AuY29tIiwic3ViIjoiM2Q1OGI2OGYtN2Q1OC00ODZhLTlmZWYtMTY4Y2FmNzNkNmY1IiwiaWF0IjoxNzg1MTU3ODU1LCJleHAiOjE3ODUyNDQyNTV9.Oj6G_KGmC6ju7TN-aLh71RnXN-pmA3EenUtrd88037w
+@customerJwt   = eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQ1VTVE9NRVIiLCJlbWFpbCI6ImJ1eWVyQGV4YW1wbGUuY29tIiwic3ViIjoiZGE4MTU1NWMtNzQzMy00NGVjLWIwMTktNTAxZDBmODE3MTUxIiwiaWF0IjoxNzg1MTU4MTYxLCJleHAiOjE3ODUyNDQ1NjF9.xA4v6vgSOGf0caVYyu7kpDFJWmhjrQVVcM-7Exk5aQw
+@productId     = PASTE_FROM_RESPONSE
+@orderId       = PASTE_FROM_RESPONSE
+@paymentId     = PASTE_FROM_RESPONSE
+
+### ============================================================
+### SECTION 1 — RETAILER FLOW
+### ============================================================
+
+### 1.1 Retailer register
+POST {{base}}/business/auth/register
+Content-Type: application/json
+
+{
+  "email": "retailer@shop.com",
+  "password": "password123",
+  "name": "Shop Owner",
+  "role": "RETAILER"
+}
+
+### 1.2 Retailer login → copy token to @retailerJwt
+POST {{base}}/business/auth/login
+Content-Type: application/json
+
+{
+  "email": "retailer@shop.com",
+  "password": "password123"
+}
+
+### 1.3 Upload product 1 (Electronics)
+POST {{base}}/business/products
+Authorization: Bearer {{retailerJwt}}
+Content-Type: application/json
+
+{
+  "name": "Wireless Headphones",
+  "description": "Noise cancelling over-ear headphones",
+  "price": 4999.00,
+  "stockQuantity": 50,
+  "category": "Electronics"
+}
+
+### 1.4 Upload product 2 (Clothing)
+POST {{base}}/business/products
+Authorization: Bearer {{retailerJwt}}
+Content-Type: application/json
+
+{
+  "name": "Cotton T-Shirt",
+  "description": "Comfortable summer t-shirt",
+  "price": 499.00,
+  "stockQuantity": 200,
+  "category": "Clothing"
+}
+
+### 1.5 Upload product 3 (Books)
+POST {{base}}/business/products
+Authorization: Bearer {{retailerJwt}}
+Content-Type: application/json
+
+{
+  "name": "Spring Boot in Action",
+  "description": "Learn Spring Boot 3",
+  "price": 899.00,
+  "stockQuantity": 100,
+  "category": "Books"
+}
+
+### 1.6 List my products
+GET {{base}}/business/products/mine
+Authorization: Bearer {{retailerJwt}}
+
+### 1.7 Update product stock
+PUT {{base}}/business/products/{{productId}}/stock?stockQuantity=75
+Authorization: Bearer {{retailerJwt}}
+
+### ============================================================
+### SECTION 2 — CUSTOMER FLOW
+### ============================================================
+
+### 2.1 Customer register
+POST {{base}}/customer/auth/register
+Content-Type: application/json
+
+{
+  "email": "buyer@example.com",
+  "password": "password123",
+  "name": "Happy Buyer",
+  "role": "CUSTOMER"
+}
+
+### 2.2 Customer login → copy token to @customerJwt
+POST {{base}}/customer/auth/login
+Content-Type: application/json
+
+{
+  "email": "buyer@example.com",
+  "password": "password123"
+}
+
+### 2.3 Browse all products (public — no auth needed)
+GET {{base}}/public/products
+
+### 2.4 Search products by category
+GET {{base}}/public/products/search?q=Electronics
+
+### 2.5 Get product detail
+GET {{base}}/public/products/{{productId}}
+
+### ============================================================
+### SECTION 3 — ORDER FLOW
+### ============================================================
+
+### 3.1 Place order (2 items)
+POST {{base}}/customer/orders
+Authorization: Bearer {{customerJwt}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": "{{productId}}", "quantity": 2 }
+  ]
+}
+
+### 3.2 View my orders
+GET {{base}}/customer/orders
+Authorization: Bearer {{customerJwt}}
+
+### 3.3 Get order detail
+GET {{base}}/customer/orders/{{orderId}}
+Authorization: Bearer {{customerJwt}}
+
+### ============================================================
+### SECTION 4 — PAYMENT FLOW
+### ============================================================
+
+### 4.1 Initiate payment → get razorpayOrderId
+POST {{base}}/customer/payments/initiate
+Authorization: Bearer {{customerJwt}}
+Content-Type: application/json
+
+{
+  "orderId": "{{orderId}}",
+  "amount": 9998.00
+}
+
+### 4.2 Verify payment signature (use Razorpay test credentials)
+POST {{base}}/customer/payments/verify
+Authorization: Bearer {{customerJwt}}
+Content-Type: application/json
+
+{
+  "razorpayOrderId": "order_placeholder",
+  "razorpayPaymentId": "pay_placeholder",
+  "razorpaySignature": "placeholder"
+}
+
+### 4.3 Simulate Razorpay webhook (payment.captured event)
+POST {{base}}/public/payments/razorpay-webhook
+Content-Type: application/json
+
+{
+  "event": "payment.captured",
+  "payload": {
+    "payment": {
+      "entity": {
+        "id": "pay_placeholder",
+        "order_id": "order_placeholder",
+        "status": "captured"
+      }
+    }
+  }
+}
+
+### ============================================================
+### SECTION 5 — RETAILER ORDER MANAGEMENT
+### ============================================================
+
+### 5.1 Retailer views incoming orders
+GET {{base}}/business/orders/incoming
+Authorization: Bearer {{retailerJwt}}
+
+### 5.2 Retailer marks order as shipped
+PUT {{base}}/business/orders/{{orderId}}/ship
+Authorization: Bearer {{retailerJwt}}
+
+### ============================================================
+### SECTION 6 — VERIFY INTEGRATION
+### ============================================================
+
+### 6.1 Check webhook platform dashboard stats
+GET http://localhost:8085/api/dashboard/stats
+
+### 6.2 Check events delivered to webhook platform
+GET http://localhost:8085/api/dashboard/events/{{eventId}}/deliveries

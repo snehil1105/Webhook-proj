@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: webhook-bridge-service
+  kafka:
+    bootstrap-servers: localhost:9097
+    consumer:
+      group-id: webhook-bridge-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 9096
+
+app:
+  webhook-platform:
+    base-url: ${WEBHOOK_PLATFORM_URL:http://localhost:8080}
+    jwt-token: ${WEBHOOK_PLATFORM_JWT_TOKEN:FILL_THIS_AFTER_LOGGING_INTO_WEBHOOK_PLATFORM}
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce: DEBUG

@@ -1,0 +1,6 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:ecom-kafka:9092}
+
+product-service:
+  base-url: ${PRODUCT_SERVICE_URL:http://ecom-product-service:9092}

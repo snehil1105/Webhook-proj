@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres-users:5432/users_db}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}

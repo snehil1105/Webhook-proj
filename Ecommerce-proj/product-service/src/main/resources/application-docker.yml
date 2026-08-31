@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://ecom-postgres-products:5432/products_db}
+  data:
+    redis:
+      host: ${REDIS_HOST:ecom-redis}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:ecom-kafka:9092}

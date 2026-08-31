@@ -1,0 +1,16 @@
+{
+  "name": "@frontend/ui",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.css",
+  "scripts": {
+    "build": "echo \"No build required\""
+  },
+  "exports": {
+    "./src/index.css": "./src/index.css",
+    "./tailwind.config": "./tailwind.config.js"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^3.0.0"
+  }
+}

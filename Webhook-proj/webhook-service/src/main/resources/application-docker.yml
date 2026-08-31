@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres-webhooks:5432/webhooks_db}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}

@@ -1,0 +1,299 @@
+# ============================================================
+# WEBHOOK DELIVERY PLATFORM — Complete API Test Suite
+# ============================================================
+# HOW TO USE:
+# 1. Start all services + Docker
+# 2. Work through each section in order
+# 3. Copy IDs from responses into the @variables below
+# ============================================================
+
+
+# ─── PASTE YOUR VALUES HERE AFTER EACH STEP ─────────────────
+@baseUser     = http://localhost:8085
+@baseWebhook  = http://localhost:8085
+@baseDelivery = http://localhost:8085
+@baseDashboard= http://localhost:8085
+# Fill these in as you go:
+@jwt          = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OTkwNmVlYS02ZmJkLTQ4ZGUtYmU1NC0xZjJhNDI0ZjhkMjciLCJlbWFpbCI6InNuZWhpbEB0ZXN0LmNvbSIsImlhdCI6MTc4NDU3NjY5OSwiZXhwIjoxNzg0NjYzMDk5fQ.l9nyzxvUtpaYNvVOSz_80IUW0PSaKN_TpSvrssT3rBA7F3gIMWBUzwCqgp132F-mSP_wxGlxtFwVANue54yMew
+@endpointId   = db8670c7-c4f2-41e6-a21b-b2961a4ecd8d
+@eventId      = 287ede1d-c8e2-44d1-ae00-f6d988d9d587
+@dlqMessageId = 1783301927550-0
+
+
+# ════════════════════════════════════════════════════════════
+# SECTION 1 — IDENTITY (User Service :8081)
+# ════════════════════════════════════════════════════════════
+
+### 1.1 Register a new user
+POST {{baseUser}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "snehil@test.com",
+  "password": "password123",
+  "name": "Snehil Dev"
+}
+
+### ─── Expected: 201 Created (empty body) ───────────────────
+
+
+### 1.2 Login → copy the "token" value into @jwt above
+POST {{baseUser}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "snehil@test.com",
+  "password": "password123"
+}
+
+### ─── Expected: 200 OK ──────────────────────────────────────
+# {
+#   "token": "eyJhbGci...",   ← copy this into @jwt
+#   "email": "snehil@test.com",
+#   "name": "Snehil Dev"
+# }
+
+
+### 1.3 Create an API Key
+POST {{baseUser}}/api/keys
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+  "name": "My Production Key"
+}
+
+### ─── Expected: 200 OK ──────────────────────────────────────
+# {
+#   "id": "...",
+#   "name": "My Production Key",
+#   "keyPrefix": "wh_abc12345",
+#   "rawKey": "wh_abc12345def...",  ← shown ONCE, save it somewhere
+#   "createdAt": "..."
+# }
+
+
+### 1.4 List all your API keys
+GET {{baseUser}}/api/keys
+Authorization: Bearer {{jwt}}
+
+### ─── Expected: rawKey is NULL — never shown again ─────────
+
+
+# ════════════════════════════════════════════════════════════
+# SECTION 2 — WEBHOOK ENDPOINTS (Webhook Service :8082)
+# ════════════════════════════════════════════════════════════
+#
+# Go to https://webhook.site right now.
+# Copy your unique URL — looks like:
+# https://webhook.site/#!/view/abc-123-def
+# The actual POST URL is: https://webhook.site/abc-123-def
+# ────────────────────────────────────────────────────────────
+
+### 2.1 Register a webhook endpoint (SUCCESS scenario)
+POST {{baseWebhook}}/api/endpoints
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+  "name": "My Order Notifications",
+  "url": "https://webhook.site/3565ca02-f2cc-4271-9c07-6d60c8f28b34",
+  "eventTypes": ["order.shipped", "order.cancelled", "payment.failed"]
+}
+
+### ─── Expected: 201 Created ─────────────────────────────────
+# {
+#   "id": "...",              ← copy this into @endpointId
+#   "name": "My Order Notifications",
+#   "url": "https://webhook.site/...",
+#   "signingSecret": "whsec_abc...",  ← copy this! verify HMAC later
+#   "eventTypes": ["order.shipped", "order.cancelled", "payment.failed"],
+#   "isActive": true,
+#   "createdAt": "..."
+# }
+
+GET http://localhost:8085/api/dashboard/stats
+Authorization: Bearer {{jwt}}
+
+
+### 2.2 Register a FAILING endpoint (for retry/DLQ demo)
+POST {{baseWebhook}}/api/endpoints
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+  "name": "Broken Endpoint",
+  "url": "https://httpstat.us/500",
+  "eventTypes": ["payment.failed"]
+}
+
+
+### ─── This endpoint always returns 500 ─────────────────────
+### ─── Use it to demonstrate retry + DLQ ────────────────────
+
+
+### 2.3 List all your endpoints
+GET {{baseWebhook}}/api/endpoints
+Authorization: Bearer {{jwt}}
+
+
+### 2.4 Deactivate an endpoint (when you want to stop deliveries)
+DELETE {{baseWebhook}}/api/endpoints/{{endpointId}}
+Authorization: Bearer {{jwt}}
+
+### ─── Expected: 204 No Content ──────────────────────────────
+
+
+# ════════════════════════════════════════════════════════════
+# SECTION 3 — PUBLISH EVENTS (Webhook Service :8082)
+# ════════════════════════════════════════════════════════════
+
+### 3.1 Publish a SUCCESS event
+# Your webhook.site endpoint is subscribed to "order.shipped"
+# This should deliver successfully
+POST {{baseWebhook}}/api/events
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+  "eventType": "order.shipped",
+  "payload": {
+    "orderId": "ORD-2024-001",
+    "customerId": "CUST-snehil",
+    "items": [
+      { "sku": "LAPTOP-PRO", "quantity": 1, "price": 999.99 },
+      { "sku": "MOUSE-WL", "quantity": 2, "price": 29.99 }
+    ],
+    "shippingAddress": {
+      "city": "Kichha",
+      "state": "Uttarakhand",
+      "country": "India"
+    },
+    "estimatedDelivery": "2024-12-25"
+  }
+}
+
+### ─── Expected: 202 Accepted ────────────────────────────────
+# {
+#   "eventId": "...",    ← copy this into @eventId
+#   "status": "queued",
+#   "message": "Event accepted and queued for delivery"
+# }
+# Now check webhook.site — POST should arrive within 1-2 seconds!
+
+
+### 3.2 Publish a FAILURE event (goes to broken endpoint → retry → DLQ)
+POST {{baseWebhook}}/api/events
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+  "eventType": "payment.failed",
+  "payload": {
+    "paymentId": "PAY-9999",
+    "customerId": "CUST-snehil",
+    "amount": 499.99,
+    "currency": "INR",
+    "reason": "Insufficient funds",
+    "failedAt": "2024-12-20T10:30:00"
+  }
+}
+
+### ─── What happens next: ────────────────────────────────────
+# Attempt 1 → 500 from httpstat.us → schedule retry in ~2s
+# Attempt 2 → 500 again → retry in ~4s
+# Attempt 3 → 500 again → retry in ~8s
+# Attempt 4 → 500 again → retry in ~16s
+# Attempt 5 → 500 again → DEAD → moves to DLQ
+# Watch delivery-service logs to see this happen live!
+
+
+### 3.3 Publish multiple event types to test fan-out
+POST {{baseWebhook}}/api/events
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+{
+  "eventType": "order.cancelled",
+  "payload": {
+    "orderId": "ORD-2024-002",
+    "reason": "Customer requested cancellation",
+    "refundAmount": 199.99
+  }
+}
+
+
+# ════════════════════════════════════════════════════════════
+# SECTION 4 — DASHBOARD (Dashboard Service :8084)
+# ════════════════════════════════════════════════════════════
+
+### 4.1 Today's stats — the "at a glance" view
+GET {{baseDashboard}}/api/dashboard/stats
+Authorization: Bearer {{jwt}}
+
+### ─── Expected ───────────────────────────────────────────────
+# {
+#   "totalEventsToday": 3,
+#   "successfulDeliveriesToday": 1,
+#   "failedDeliveriesToday": 4,
+#   "deadDeliveriesToday": 1,
+#   "dlqSize": 1,
+#   "successRatePercent": 33.3
+# }
+
+
+### 4.2 Full delivery history for one event
+# Paste the eventId from the FAILED event (payment.failed) here
+GET {{baseDashboard}}/api/dashboard/events/{{eventId}}/deliveries
+Authorization: Bearer {{jwt}}
+
+### ─── You'll see all 5 attempts with: ──────────────────────
+# attempt 1: status=FAILED, httpStatus=500, durationMs=...
+# attempt 2: status=FAILED, httpStatus=500, durationMs=...
+# attempt 3: status=FAILED, httpStatus=500, durationMs=...
+# attempt 4: status=FAILED, httpStatus=500, durationMs=...
+# attempt 5: status=DEAD,   httpStatus=500, durationMs=...
+
+
+### 4.3 All deliveries for a specific endpoint
+GET {{baseDashboard}}/api/dashboard/endpoints/{{endpointId}}/deliveries
+Authorization: Bearer {{jwt}}
+
+
+### 4.4 Filter by status — show only failures
+GET {{baseDashboard}}/api/dashboard/endpoints/{{endpointId}}/deliveries?status=FAILED
+Authorization: Bearer {{jwt}}
+
+
+### 4.5 View Dead Letter Queue
+GET {{baseDashboard}}/api/dashboard/dlq
+Authorization: Bearer {{jwt}}
+
+### ─── Expected ───────────────────────────────────────────────
+# [
+#   {
+#     "messageId": "1703001234567-0",   ← copy into @dlqMessageId
+#     "eventId": "...",
+#     "endpointId": "...",
+#     "endpointUrl": "https://httpstat.us/500",
+#     "eventType": "payment.failed",
+#     "failureReason": "HTTP 500",
+#     "payload": { ... }
+#   }
+# ]
+
+
+### 4.6 REPLAY — the impressive demo feature
+# This re-queues the dead event for fresh delivery
+# Before running this: update your broken endpoint's URL to
+# a working one (or just watch what happens in the logs)
+POST {{baseDashboard}}/api/dashboard/dlq/{{dlqMessageId}}/replay
+Authorization: Bearer {{jwt}}
+
+### ─── Expected: 202 Accepted ────────────────────────────────
+# {
+#   "status": "queued",
+#   "message": "Event re-queued for delivery",
+#   "originalMessageId": "1703001234567-0"
+# }
+# Now watch delivery-service logs — worker picks it up again!

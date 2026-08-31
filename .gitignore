@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+dist/
+build/
+out/
+bin/
+
+# Environment configurations
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+**/.env
+**/*.env
+
+# Java Maven / Gradle build outputs
+**/target/
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+**/.gradle/
+**/build/
+.settings/
+.classpath
+.project
+
+# IDE configs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.project
+.classpath
+.settings/
+
+# Database directories / Volume paths
+**/postgres-data/
+**/pgdata/
+
+# OS specific files
+.DS_Store
+Thumbs.db

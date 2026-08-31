@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: inventory-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9097}
+    consumer:
+      group-id: inventory-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 9095
+
+product-service:
+  base-url: ${PRODUCT_SERVICE_URL:http://localhost:9092}
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce: DEBUG

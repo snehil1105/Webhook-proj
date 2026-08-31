@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://ecom-postgres-payments:5432/payments_db}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:ecom-kafka:9092}
+
+order-service:
+  base-url: ${ORDER_SERVICE_URL:http://ecom-order-service:9093}
+product-service:
+  base-url: ${PRODUCT_SERVICE_URL:http://ecom-product-service:9092}
+user-service:
+  base-url: ${USER_SERVICE_URL:http://ecom-user-service:9091}

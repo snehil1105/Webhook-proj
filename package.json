@@ -1,0 +1,15 @@
+{
+  "name": "ecommerce-hookrelay-frontend",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:storefront": "npm run dev --workspace=storefront",
+    "dev:seller": "npm run dev --workspace=seller-dashboard",
+    "dev:console": "npm run dev --workspace=hookrelay-console",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces"
+  }
+}

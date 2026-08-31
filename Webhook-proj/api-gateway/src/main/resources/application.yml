@@ -1,0 +1,73 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+
+        # ── User Service ──────────────────────────────────────
+        # Auth endpoints are PUBLIC — no JWT needed
+        - id: user-service-auth
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: false
+
+        # Key management requires JWT
+        - id: user-service-keys
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/keys/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true
+
+        # ── Webhook Service ───────────────────────────────────
+        - id: webhook-service-endpoints
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/endpoints/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true
+
+        - id: webhook-service-events
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/events/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true
+
+        # ── Dashboard Service ─────────────────────────────────
+        - id: dashboard-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/dashboard/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO

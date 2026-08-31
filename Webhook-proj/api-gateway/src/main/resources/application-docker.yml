@@ -1,0 +1,54 @@
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: user-service-auth
+          uri: http://user-service:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: false
+
+        - id: user-service-keys
+          uri: http://user-service:8081
+          predicates:
+            - Path=/api/keys/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true
+
+        - id: webhook-service-endpoints
+          uri: http://webhook-service:8082
+          predicates:
+            - Path=/api/endpoints/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true
+
+        - id: webhook-service-events
+          uri: http://webhook-service:8082
+          predicates:
+            - Path=/api/events/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true
+
+        - id: dashboard-service
+          uri: http://dashboard-service:8084
+          predicates:
+            - Path=/api/dashboard/**
+          filters:
+            - name: JwtAuthFilter
+              args:
+                requireAuth: true

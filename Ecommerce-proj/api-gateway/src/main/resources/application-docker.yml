@@ -1,0 +1,105 @@
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        # Public routes (no auth)
+        - id: user-business-auth
+          uri: http://ecom-user-service:9091
+          predicates:
+            - Path=/business/auth/**
+        - id: user-customer-auth
+          uri: http://ecom-user-service:9091
+          predicates:
+            - Path=/customer/auth/**
+        - id: product-public
+          uri: http://ecom-product-service:9092
+          predicates:
+            - Path=/public/products/**
+        - id: payment-public
+          uri: http://ecom-payment-service:9094
+          predicates:
+            - Path=/public/payments/**
+
+        # Business routes (require RETAILER JWT)
+        - id: user-public-sellers
+          uri: http://ecom-user-service:9091
+          predicates:
+            - Path=/public/sellers/**
+        - id: user-business-sellers
+          uri: http://ecom-user-service:9091
+          predicates:
+            - Path=/business/sellers/**
+          filters:
+            - name: JwtAuthFilter
+        - id: user-business-profile
+          uri: http://ecom-user-service:9091
+          predicates:
+            - Path=/business/profile/**
+          filters:
+            - name: JwtAuthFilter
+        - id: product-business
+          uri: http://ecom-product-service:9092
+          predicates:
+            - Path=/business/products/**
+          filters:
+            - name: JwtAuthFilter
+        - id: order-business
+          uri: http://ecom-order-service:9093
+          predicates:
+            - Path=/business/orders/**
+          filters:
+            - name: JwtAuthFilter
+        - id: coupon-business
+          uri: http://ecom-order-service:9093
+          predicates:
+            - Path=/business/coupons/**
+          filters:
+            - name: JwtAuthFilter
+
+        # Customer routes (require CUSTOMER JWT)
+        - id: order-customer
+          uri: http://ecom-order-service:9093
+          predicates:
+            - Path=/customer/orders/**
+          filters:
+            - name: JwtAuthFilter
+        - id: payment-customer
+          uri: http://ecom-payment-service:9094
+          predicates:
+            - Path=/customer/payments/**
+          filters:
+            - name: JwtAuthFilter
+        - id: product-customer
+          uri: http://ecom-product-service:9092
+          predicates:
+            - Path=/customer/wishlist/**
+          filters:
+            - name: JwtAuthFilter
+        - id: cart-customer
+          uri: http://ecom-order-service:9093
+          predicates:
+            - Path=/customer/cart/**
+          filters:
+            - name: JwtAuthFilter
+        - id: address-customer
+          uri: http://ecom-user-service:9091
+          predicates:
+            - Path=/customer/addresses/**
+          filters:
+            - name: JwtAuthFilter
+        - id: profile-customer
+          uri: http://ecom-user-service:9091
+          predicates:
+            - Path=/customer/profile
+          filters:
+            - name: JwtAuthFilter
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f}
