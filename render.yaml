@@ -212,6 +212,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
+      - key: USER_SERVICE_URL
+        fromService:
+          name: ecom-user-service
+          type: web
+          property: url
+      - key: PRODUCT_SERVICE_URL
+        fromService:
+          name: ecom-product-service
+          type: web
+          property: url
+      - key: ORDER_SERVICE_URL
+        fromService:
+          name: ecom-order-service
+          type: web
+          property: url
+      - key: PAYMENT_SERVICE_URL
+        fromService:
+          name: ecom-payment-service
+          type: web
+          property: url
 
   # ── Webhook Platform Services ───────────────────────────────
 
@@ -389,3 +409,23 @@ services:
         value: docker
       - key: JWT_SECRET
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+      - key: USER_SERVICE_URL
+        fromService:
+          name: webhook-user-service
+          type: web
+          property: url
+      - key: WEBHOOK_SERVICE_URL
+        fromService:
+          name: webhook-service
+          type: web
+          property: url
+      - key: DELIVERY_SERVICE_URL
+        fromService:
+          name: webhook-delivery-service
+          type: web
+          property: url
+      - key: DASHBOARD_SERVICE_URL
+        fromService:
+          name: webhook-dashboard-service
+          type: web
+          property: url
