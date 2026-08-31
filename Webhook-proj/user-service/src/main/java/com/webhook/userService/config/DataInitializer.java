@@ -18,13 +18,16 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (!userRepository.existsByEmail("admin@auraretail.com")) {
-            User admin = User.builder()
-                    .name("Aura Admin")
-                    .email("admin@auraretail.com")
-                    .password(passwordEncoder.encode("AuraDevConsole2026!"))
-                    .build();
+        try {
+            User admin = userRepository.findByEmail("admin@auraretail.com")
+                    .orElseGet(() -> User.builder()
+                            .name("Aura Admin")
+                            .email("admin@auraretail.com")
+                            .build());
+            admin.setPassword(passwordEncoder.encode("AuraDevConsole2026!"));
             userRepository.save(admin);
+        } catch (Exception e) {
+            System.err.println("Webhook DataInitializer warning: " + e.getMessage());
         }
     }
 }

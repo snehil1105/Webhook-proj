@@ -23,25 +23,25 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Seed Customer Demo Account
-        if (!userRepository.existsByEmail("recruiter.customer@example.com")) {
-            User customer = User.builder()
-                    .name("Recruiter Customer")
-                    .email("recruiter.customer@example.com")
-                    .passwordHash(passwordEncoder.encode("password123"))
-                    .role(User.Role.CUSTOMER)
-                    .build();
+        try {
+            // Seed / Update Customer Demo Account
+            User customer = userRepository.findByEmail("recruiter.customer@example.com")
+                    .orElseGet(() -> User.builder()
+                            .name("Recruiter Customer")
+                            .email("recruiter.customer@example.com")
+                            .role(User.Role.CUSTOMER)
+                            .build());
+            customer.setPasswordHash(passwordEncoder.encode("password123"));
             userRepository.save(customer);
-        }
 
-        // Seed Seller Demo Account
-        if (!userRepository.existsByEmail("recruiter.seller@example.com")) {
-            User sellerUser = User.builder()
-                    .name("Recruiter Seller")
-                    .email("recruiter.seller@example.com")
-                    .passwordHash(passwordEncoder.encode("password123"))
-                    .role(User.Role.RETAILER)
-                    .build();
+            // Seed / Update Seller Demo Account
+            User sellerUser = userRepository.findByEmail("recruiter.seller@example.com")
+                    .orElseGet(() -> User.builder()
+                            .name("Recruiter Seller")
+                            .email("recruiter.seller@example.com")
+                            .role(User.Role.RETAILER)
+                            .build());
+            sellerUser.setPasswordHash(passwordEncoder.encode("password123"));
             User savedSeller = userRepository.save(sellerUser);
 
             if (sellerRepository.findByUserId(savedSeller.getId()).isEmpty()) {
@@ -53,6 +53,8 @@ public class DataInitializer implements CommandLineRunner {
                         .build();
                 sellerRepository.save(seller);
             }
+        } catch (Exception e) {
+            System.err.println("DataInitializer warning: " + e.getMessage());
         }
     }
 }
