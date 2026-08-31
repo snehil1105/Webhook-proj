@@ -11,6 +11,7 @@ services:
     plan: free
     maxmemoryPolicy: allkeys-lru
     region: oregon
+    ipAllowList: []
 
   # ── Ecommerce Services ──────────────────────────────────────
 
