@@ -1,6 +1,13 @@
+FROM maven:3.9.5-eclipse-temurin-21 AS builder
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+COPY src ./src
+RUN mvn package -DskipTests -q
+
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY target/*.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring
 EXPOSE 8082
