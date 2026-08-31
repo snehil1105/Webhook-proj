@@ -1,0 +1,246 @@
+databases:
+  - name: ecom-postgres-db
+    databaseName: ecom_db
+    user: ecom_user
+    plan: free
+    region: oregon
+
+services:
+  - type: redis
+    name: ecom-redis-db
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    region: oregon
+
+  # ── Ecommerce Services ──────────────────────────────────────
+
+  - type: web
+    name: ecom-user-service
+    env: docker
+    rootDir: Ecommerce-proj/user-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+
+  - type: web
+    name: ecom-product-service
+    env: docker
+    rootDir: Ecommerce-proj/product-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: REDIS_HOST
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: port
+
+  - type: web
+    name: ecom-order-service
+    env: docker
+    rootDir: Ecommerce-proj/order-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: PRODUCT_SERVICE_URL
+        value: http://ecom-product-service:9092
+      - key: REDIS_HOST
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: port
+
+  - type: web
+    name: ecom-payment-service
+    env: docker
+    rootDir: Ecommerce-proj/payment-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: USER_SERVICE_URL
+        value: http://ecom-user-service:9091
+      - key: PRODUCT_SERVICE_URL
+        value: http://ecom-product-service:9092
+      - key: ORDER_SERVICE_URL
+        value: http://ecom-order-service:9093
+      - key: RAZORPAY_KEY_ID
+        value: rzp_test_TUIFebkOVVnvfJ
+      - key: RAZORPAY_KEY_SECRET
+        value: aIZ1vx3GMa3pVxF5rR0Nn9PE
+
+  - type: web
+    name: ecom-inventory-service
+    env: docker
+    rootDir: Ecommerce-proj/inventory-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: PRODUCT_SERVICE_URL
+        value: http://ecom-product-service:9092
+
+  - type: web
+    name: ecom-webhook-bridge
+    env: docker
+    rootDir: Ecommerce-proj/webhook-bridge-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: WEBHOOK_PLATFORM_URL
+        value: http://webhook-api-gateway:8080
+      - key: WEBHOOK_PLATFORM_JWT_TOKEN
+        value: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiYzNhM2I4OS00YzM2LTRlOGYtYWRlOS1jZDY4MjI3N2E0MjkiLCJlbWFpbCI6ImFkbWluQGF1cmFyZXRhaWwuY29tIiwiaWF0IjoxNzg4MDg1NjE5LCJleHAiOjIxMDM0NDU2MTl9.U7GqN0Y8NUbr2cTUFndJn1H_FYuPdqjLBFg01Wp5d9Sra5zG8MUf2LN6iTyuI-s_Gi6bG7x9KBGcPPeMX0W7VQ
+
+  - type: web
+    name: ecom-api-gateway
+    env: docker
+    rootDir: Ecommerce-proj/api-gateway
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
+
+  # ── Webhook Platform Services ───────────────────────────────
+
+  - type: web
+    name: webhook-user-service
+    env: docker
+    rootDir: Webhook-proj/user-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: REDIS_HOST
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: host
+
+  - type: web
+    name: webhook-service
+    env: docker
+    rootDir: Webhook-proj/webhook-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: REDIS_HOST
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: port
+
+  - type: web
+    name: webhook-delivery-service
+    env: docker
+    rootDir: Webhook-proj/delivery-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: REDIS_HOST
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: port
+
+  - type: web
+    name: webhook-dashboard-service
+    env: docker
+    rootDir: Webhook-proj/dashboard-service
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+      - key: DB_URL
+        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: REDIS_HOST
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecom-redis-db
+          type: redis
+          property: port
+
+  - type: web
+    name: webhook-api-gateway
+    env: docker
+    rootDir: Webhook-proj/api-gateway
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: JWT_SECRET
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
