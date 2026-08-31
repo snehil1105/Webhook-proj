@@ -23,6 +23,9 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.group-id:webhook-bridge-service-group}")
     private String groupId;
 
+    @Value("${spring.kafka.listener.auto-startup:false}")
+    private boolean autoStartup;
+
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -39,6 +42,7 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setAutoStartup(autoStartup);
         return factory;
     }
 }
