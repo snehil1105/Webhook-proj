@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://postgres-webhooks:5432/webhooks_db}
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:postgres-webhooks}:${DB_PORT:5432}/${DB_NAME:webhooks_db}}
   data:
     redis:
       host: ${REDIS_HOST:redis}

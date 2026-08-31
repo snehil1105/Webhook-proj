@@ -26,8 +26,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
 
   - type: web
     name: ecom-product-service
@@ -40,8 +58,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
       - key: REDIS_HOST
         fromService:
           name: ecom-redis-db
@@ -64,8 +100,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
       - key: PRODUCT_SERVICE_URL
         value: http://ecom-product-service:9092
       - key: REDIS_HOST
@@ -90,8 +144,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7d5a58ba43e2c9d9c0b8fe8e9f
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
       - key: USER_SERVICE_URL
         value: http://ecom-user-service:9091
       - key: PRODUCT_SERVICE_URL
@@ -154,8 +226,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
       - key: REDIS_HOST
         fromService:
           name: ecom-redis-db
@@ -173,8 +263,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
       - key: REDIS_HOST
         fromService:
           name: ecom-redis-db
@@ -197,8 +305,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
       - key: REDIS_HOST
         fromService:
           name: ecom-redis-db
@@ -221,8 +347,26 @@ services:
         value: docker
       - key: JWT_SECRET
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
-      - key: DB_URL
-        value: jdbc:postgresql://${ecom-postgres-db.host}:${ecom-postgres-db.port}/${ecom-postgres-db.database}?user=${ecom-postgres-db.user}&password=${ecom-postgres-db.password}
+      - key: DB_HOST
+        fromDatabase:
+          name: ecom-postgres-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ecom-postgres-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ecom-postgres-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ecom-postgres-db
+          property: password
       - key: REDIS_HOST
         fromService:
           name: ecom-redis-db

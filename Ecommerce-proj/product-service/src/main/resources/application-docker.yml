@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://ecom-postgres-products:5432/products_db}
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:ecom-postgres-products}:${DB_PORT:5432}/${DB_NAME:products_db}}
   data:
     redis:
       host: ${REDIS_HOST:ecom-redis}
