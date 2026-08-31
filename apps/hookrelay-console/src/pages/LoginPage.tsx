@@ -85,6 +85,26 @@ export const LoginPage: React.FC = () => {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+
+          {/* Recruiter Demo Account Banner */}
+          <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 text-center space-y-2 mt-4 text-[11px]">
+            <p className="font-semibold text-indigo-400">Are you a Recruiter / Guest?</p>
+            <p className="text-slate-500">Click below to autofill demo developer credentials:</p>
+            <div className="font-mono bg-slate-950 border border-slate-800 py-1.5 px-3 rounded-lg inline-block text-slate-400">
+              <div>Email: <span className="font-bold text-indigo-300">admin@auraretail.com</span></div>
+              <div>Password: <span className="font-bold text-indigo-300">AuraDevConsole2026!</span></div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('admin@auraretail.com');
+                setPassword('AuraDevConsole2026!');
+              }}
+              className="block w-full font-semibold bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 rounded-lg transition-colors mt-1"
+            >
+              Autofill Credentials
+            </button>
+          </div>
         </div>
 
         <div className="text-center text-xs text-slate-500 mt-6">
